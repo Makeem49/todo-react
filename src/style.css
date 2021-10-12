@@ -78,4 +78,8 @@ li {
     color: black;
 }
 
+input[type='checkbox'] {
+    color: green;
+}
+
 

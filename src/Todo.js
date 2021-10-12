@@ -1,12 +1,28 @@
-import React , {useState} from "react";
+import React , {useState, useEffect} from "react";
+import Form from "./Form.js";
+import TodoList  from "./TodoList.js";
 
 export default function Todo() {
 
     const [inputTodo, setInputTodo ] = useState('');
     const [todos , setTodo] = useState([]);
-    const [complete , setComplete ] = useState([]);
     const [validationMessage, setValidationMessaege] = useState('');
+    const [completedTask, setCompletedTask] = useState([]);
+    const [date, setDate] = useState()
 
+
+    useEffect(() => {
+        document.title = `Completed task [ ${completedTask.length} ]`
+
+        return () => {
+            document.title = ''
+        }
+    }, [completedTask])
+
+    // useEffect(() => {
+    //     setDate()
+    // })
+ 
     function handleInputSubmit(e) {
         e.preventDefault()
 
@@ -15,72 +31,51 @@ export default function Todo() {
             return ;
         }
 
-
         const addTodo = {
             id : todos.length,
             task : inputTodo,
         }
-
         setTodo([addTodo ,...todos])
-
         setInputTodo('')
+        setValidationMessaege('')
     }
 
-    function handleCheckInput(index, e) {
-        const completedTask = todos.filter( item => {
-            return item.id === index
-        })
+    console.log(todos)
 
-        
-        
-        
+
+    function handleCheckInput(index) {
+        // console.log({index})
         const pendingTask = todos.filter(item => {
-            return item.id !== index
+            return item.id !== index;
         })
+        const doneTask  = todos[index]
+
+        setCompletedTask([doneTask,...completedTask])
         setTodo(prevItems => [...pendingTask])
-        setComplete(prevData => [...completedTask])
     }
 
     const listPendingTodo = todos.map( item => {
         return <div className='todo-output' key={item.id}>
             <li> {item.task} </li>
-            <input type="checkbox" name="check" id="check" onClick={(e) => handleCheckInput(item.id)}/>
+            <input type="checkbox" name="check" id="check" onClick={() => handleCheckInput(item.id)}/>
         </div>
     })
+
+    const listCompleted = completedTask.map(item => {
     
+        return <div className="todo-output" key={item.id}> 
+            <li> {item.task} </li>
+            <input type="checkbox" name="check" id="check" checked disabled/>
+        </div>
+    }) 
 
 
     return <div className='container'>
         <h1>Track your tasks and stay productive</h1>
-        
-        <div className="todo-form">
-            <form onSubmit={handleInputSubmit}>
-                <label htmlFor="todo">Task todo :</label><br/>
-                <input type="text" value={inputTodo} onChange={(e) => setInputTodo(e.target.value)}  id='todo'   placeholder='Input task'/>
 
-                <button id='click' >Submit</button> 
-                <p id='message'>{validationMessage}</p>
+        <Form onFormSubmit={handleInputSubmit} inputTodo={inputTodo} validationMessage={validationMessage} setInputTodo={setInputTodo}/> 
 
-            </form>
-        </div>
+        <TodoList listPendingTodo={listPendingTodo} listCompleted={listCompleted}/> 
 
-
-        <div className="list-todo">
-            <h3>Pending Task</h3>
-            <ul>
-                {listPendingTodo}              
-            </ul>
-        </div>
-
-        <div className="list-todo">
-            <h3>Completed task</h3>
-            <ul>
-            <p>Lorem, ipsum.</p>                
-                <p>Lorem, ipsum.</p>                
-                <p>Lorem, ipsum.</p>                
-                <p>Lorem, ipsum.</p>                
-                <p>Lorem, ipsum.</p> 
-            </ul>
-        </div>
     </div>
 }
